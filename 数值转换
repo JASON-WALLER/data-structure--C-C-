@@ -1,0 +1,80 @@
+#include <stdio.h>
+// 为了使用malloc()、free()和exit()函数
+#include <stdlib.h>
+typedef struct node *frame;
+// 栈帧的数据结构
+struct node {
+    int data;
+    frame prev;
+};
+
+ int len = 0;// 堆栈长度
+
+frame top = NULL;// 堆栈的顶部
+
+ int getlen(void) {// 获得堆栈的栈帧数量（长度）
+    return len;
+}
+// 判断堆栈是否为空
+int is_empty(void) {
+    return (len == 0);
+}
+// 产生一个新的栈帧
+frame new_frame(int data) {
+    frame nf = (frame) malloc(sizeof(struct node));
+    // 下面3句是在没有分配到动态内存时做的错误处理
+    if (nf ==NULL ) {
+        perror("Error: can not allocate memory, quit.\n");
+        exit(0);
+    }
+    nf->data = data;
+    nf->prev = NULL;
+    return nf;
+}
+// 出栈操作
+int pop(void) {
+    if (!is_empty()) {
+        int ret_int = top->data;
+        frame out = top;
+        top = top->prev;
+        len--;
+        free(out);
+        return ret_int;
+    } else {
+        perror("Error: can not pop from stack, because the stack is empty.\n");
+        exit(0);
+    }
+}
+// 入栈操作
+void push(int data) {
+    frame in = new_frame(data);
+    in->prev = top;
+    top = in;
+    len++;
+}
+// 将十进制数字的余数存储到堆栈之中
+void binary_convert(int num) {
+    while(num / 2) {
+        push(num % 2);
+        num /= 2;
+    }
+    push(num % 2);
+}
+// 利用堆栈打印二进制数字
+void print_binary(void) {
+    while(!is_empty())
+        printf("%d", pop());
+}
+int main(void) {
+    // 用于接收用户输入的十进制数字
+    int user_in = 0;
+    printf("输入十进制数: ");
+    scanf("%d", &user_in);
+    // 将十进制数字通过堆栈转换为二进制数字
+    binary_convert(user_in);
+    printf("二进制: ");
+    // 打印二进制数字
+    print_binary();
+    printf("\n");
+    return 0;
+}
