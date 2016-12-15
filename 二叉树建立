@@ -1,0 +1,63 @@
+#include<iostream>        	
+using namespace std;
+
+typedef struct node	// *BiTree是给 struct node*起了个别名，叫BiTree，所以BiTree为指向节点的指针
+{
+    struct node *lchild;    //声明二叉树的左右子孩子。
+    struct node *rchild;
+    char data;			  //声明根结点
+}BiTreeNode, *BiTree;
+
+void createBiTree(BiTree &T) //创建二叉树函数
+{
+
+    char c;
+	cin>>c;
+    if('#' == c)     //当遇到#时，令树的根节点为NULL，从而结束该分支的递归        
+        T = NULL;
+    else
+    {
+        T = new BiTreeNode;  	//以“先序”顺序读入各结点
+        T->data=c;
+        createBiTree(T->lchild);
+        createBiTree(T->rchild);
+    }
+}
+
+
+//中序遍历二叉树并打印出来
+void midorder(BiTree T)
+{
+    if(T)
+    {
+        midorder(T->lchild); 		//中序遍历左子树
+        cout<<T->data<<" ";			//访问根结点
+        midorder(T->rchild);			//中序遍历右子树
+    }
+}
+
+int Depth(BiTree T)      //求树的高度算法实现
+{
+	int depl,  depr;			//分别求左右两个子孩子的最高深度，再将两个
+	if (T){					最高的数进行比较，输出最大的，即为树的深度
+		depl=Depth(T->lchild);
+		depr=Depth(T->rchild);
+		if (depl>=depr) return (depl+1);
+		else return (depr+1);
+	        }
+	return 0;
+}
+
+int main()					//主算法
+{
+    BiTree T;          		//声明一个指向二叉树根节点的指针                  
+    createBiTree(T);
+    cout<<"二叉树创建完成！"<<endl;
+    cout<<"中序遍历二叉树："<<endl;
+    midorder(T);
+    cout<<endl;				//输出中序遍历二叉树结点
+	cout<<"树的深度："<<endl;
+    Depth(T);				//输出树的深度
+	cout<<Depth(T)<<endl;
+    return 0;
+}
