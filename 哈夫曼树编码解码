@@ -1,0 +1,132 @@
+/*建立哈夫曼树，并进行哈夫曼编码*/
+#include "iostream"
+using namespace std;
+#include "stdlib.h"
+#include "string.h"
+#include "stdio.h"
+
+typedef struct{
+    unsigned int weight;				//用来存放结点的权值 
+    unsigned int parent,lchild,rchild;	//孩子和双亲 
+}  HTNode, *HuffmanTree;				//动态分配数组存储赫夫曼树 
+
+typedef char**  HuffmanCode;			//动态分配数组,用于存放哈夫曼编码表
+
+
+int Select( HuffmanTree ht,int k)
+{
+	int i, N;
+    for( i=1;i<=k;i++)
+		if( ht[i].parent==0)
+		{
+			N=i;     // 将第1个没有使用过的权值的编号赋予N
+			break;
+		}
+    for( i=N+1;i<=k;i++)
+      if( ht[i].weight<ht[N].weight && ht[i].parent==0)
+         N=i;
+    ht[N].parent=k+1;
+    return N;
+}
+HuffmanTree CreateHuffman(  int *w,	 int n)		// w是一个数组，存放n个字符的权值 共n个字符 					  				
+{ 
+	HuffmanTree  ht;			//赫夫曼树ht
+	int max=2*n-1;				//总结点个数    
+	int i, s1,s2;     
+	
+	ht= (HuffmanTree)malloc(  (max+1)*sizeof(HTNode)  ); //开辟静态链表空间，0号单元未用     
+	for ( i=1; i<=n; i++  ) 	//叶子结点初始化
+	{
+		ht[i].weight=w[i];
+		ht[i].parent=0;     ht[i].lchild=0;    ht[i].rchild=0;
+	}
+	for ( i=n+1; i<=max; i++  ) 	//非叶子结点初始化
+	{
+		ht[i].weight=0;
+		ht[i].parent=0;     ht[i].lchild=0;    ht[i].rchild=0;
+	}
+	for (i=n+1; i<=max; i++)		//非叶子结点其它域赋值
+	{   
+		//在ht[1 .. i-1]中，选择parent为0且weight最小的两个结点，其序号分别为s1 和 s2
+		s1=Select(ht,i-1);
+		s2=Select(ht,i-1);
+		ht[i].lchild = s1;            ht[i].rchild = s2;
+		ht[i].weight = ht[s1].weight + ht[s2].weight;
+	}
+	return ht;
+}
+HuffmanCode  Code(  HuffmanTree ht,    		//赫夫曼树ht     
+                   int n  )         		//共n个字符 
+{
+	//从叶子到根逆向求哈夫曼编码
+	 HuffmanCode HC;
+	char *cd;                                //针对某一个字符进行编码
+	unsigned int c,p;
+	int i,  start;
+  	HC=  (HuffmanCode)malloc((n+1)*sizeof(char *));					//动态分配指针数组，0号单元未用  
+  	cd = (char*)malloc(n*sizeof(char));								//动态分配求编码的数组空间	
+ 	
+  	cd[n-1]='\0';    			//n个字符，最长编码长度为n-1,即 0~ n-2,所以编码结束符在n-1处
+  	for (i=1;i<=n;++i)    		//逐个字符求哈夫曼编码，方法：从叶结点开始，向根追踪
+ 	{
+		start = n-2;      		//编码结束符位置
+		for (c=i, p=ht[i].parent; p!=0; c=p, p=ht[p].parent)    //从叶向根追踪
+             if (ht[p].lchild ==c) 
+				 cd[start--]='0';				//左孩子填0
+             else 
+				 cd[start--]='1';				//右孩子填1
+        HC[i]=(char *)malloc((n-1 -start)*sizeof(char));			//为第i个字符编码分配空间，大小：n-start-1，其中最后一位存放'\0'
+								
+        strcpy(HC[i],&cd[start+1]);				//从cd复制编码（串）到HC
+  	} 
+	return HC;
+}
+void print(	
+			HuffmanTree ht,    		//哈夫曼树ht
+			HuffmanCode HC,			//哈夫曼编码表HC
+            int n  
+		  ) 
+{
+	int i;
+	for( i=1; i<=n; i++)
+        cout<<ht[i].weight <<":"<< HC[i]<<endl;   //输出编码
+}
+
+void decode(HuffmanTree ht,int w[],int m, char d[] )
+{	int p;	int i;	char c;
+	i=0;
+label:p=2*m-1;	
+	while( ht[p].lchild!=0)
+	{
+		c=d[i];
+		i++;
+		if(c=='#')
+		{
+			printf("结束.\n");
+			return;
+		}
+		else if(c=='0')
+			p=ht[p].lchild;
+		else if(c=='1')
+			p=ht[p].rchild;
+	}
+	printf("%d",w[p]);
+	goto label;
+}
+main()
+{
+    HuffmanTree ht;    //存放树结点
+    HuffmanCode HC;    //一个指针数组，存放哈夫曼编码表
+	char ch[100];
+    int w[]={-1,5,29,7,8,14,23,3,11};
+	int n=8;
+	   
+    ht=CreateHuffman(  w, n);		//构造赫夫曼树
+    
+    HC=Code(   ht, n );
+	cout<<"赫夫曼编码如下:"<<endl;
+	print(ht,HC,n);				//输出编码
+
+	scanf("%s",ch);
+	decode(ht,w,8,ch);
+}
