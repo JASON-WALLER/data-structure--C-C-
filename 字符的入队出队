@@ -1,69 +1,71 @@
-#include <iostream>  
-using namespace std;  
-   
-/*循环队列的类型定义*/  
-const int Queue_Size=100;  
-   
-typedef struct circlQueue  
-{  
-       char *elem;  
-       int rear;  
-       int front;  
-       int queueSize;  
-}circlQueue;  
-   
-   
-   
-/*初始化*/  
-void initQueue_C(circlQueue &Q)  
-{  
-       Q.elem=new char[Queue_Size];  
-       Q.front=Q.rear=0;//首尾指针相等说明队列为空。  
-       Q.queueSize=Queue_Size;  
-}  
-   
-   
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
 
-void destroyQueue_C(circlQueue &Q)  //销毁队列
-{  
-       delete []Q.elem;  
-       Q.front=Q.rear=0;   //使首尾相等，销毁队列 
-       Q.queueSize=0;  
-}  
-   
-   
-/*入队列*/  
-void enterQueue_C(circlQueue &Q,char x)  
-{  
-       if(((Q.rear+1)%Q.queueSize)==Q.front)//判断队满的情况  
-              cout<<"Queue OverFlow!";  
-       Q.elem[Q.rear]=x;  
-       Q.rear=(Q.rear+1)%Queue_Size;//尾指针应以此种方式加1，才会实现循环队列。  
-}  
-   
-/*出队列*/  
-char outputQueue_C(circlQueue &Q)  
-{  
-       char e;  
-       if(Q.rear==Q.front)  
-              cout<<"Queue Empty";  
-       e=Q.elem[Q.front];  
-       Q.front=(Q.front+1)%Q.queueSize;;//头指针应以此种方式加1，才会实现循环队列。  
-       return e;  
-}  
-   
-   int main()  
-{  
-       circlQueue Q;  
-       initQueue_C(Q);  				//初始化队列 
-       enterQueue_C(Q,'a');  			//字符a入队 
-       enterQueue_C(Q,'b');  	
-       enterQueue_C(Q,'c');  			 
-       enterQueue_C(Q,'d');  			
-       cout<<outputQueue_C(Q)<<endl;  	//按顺序出队，一共出队3个 
-       cout<<outputQueue_C(Q)<<endl;  	//同上 
-       cout<<outputQueue_C(Q)<<endl;  
-       destroyQueue_C(Q);  				//销毁队列 
-}  
+#define M 5
+struct CycQueue{
+	char arr[M];
+	int front;
+	int rear;
+};
+void InitQ(CycQueue &cq)
+{
+	cq.front=0;
+	cq.rear=0;
+}
+bool fullQ(CycQueue cq)
+{
+	if( (cq.rear+1)%M==cq.front)
+		return true;
+	else
+		return false;
+}
+bool emptyQ(CycQueue cq)
+{
+	if( cq.rear==cq.front)
+		return true;
+	else
+		return false;
+}
+void InQ(CycQueue &cq, char ch)
+{
+	cq.arr[cq.rear]=ch;
+	cq.rear=(cq.rear+1)%M;
+}
+void OutQ(CycQueue &cq, char &ch)
+{
+	ch=cq.arr[cq.front];
+	cq.front=(cq.front+1)%M;
+}
 
+//方法二：进满-全出空，再进满-再全出空
+int main()
+{
+	CycQueue CQ;
+	char ch1,ch2;
 
+	InitQ(CQ);
+	ch1=getchar();
+	while( ch1!='#')
+	{
+		if( !fullQ(CQ) )
+		{
+			InQ(CQ,ch1);
+			ch1=getchar();
+		}
+		else
+			while(!emptyQ(CQ))
+			{
+				OutQ(CQ,ch2);
+				printf("%c",ch2);
+			}
+	}
+	while(!emptyQ(CQ))
+	{
+		OutQ(CQ,ch2);
+		printf("%c",ch2);
+	}
+	printf("\n");
+}
+
+   
