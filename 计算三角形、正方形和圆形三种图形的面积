@@ -1,0 +1,55 @@
+#include<iostream>
+using namespace std;
+
+class base {	// 基类
+protected:
+	int x, y;
+public:
+	base(int x, int y) {
+		base::x = x;
+		base::y = y;
+	}
+	virtual void disp() {
+		cout << "这个类没有面积" << endl;
+	}
+};
+
+class triangle : public base {	// 定义三角形类，基类成员x为底边长，y为高
+public:
+	triangle(int x, int y) : base(x, y) {}
+	void disp() {
+		cout << "三角形面积：" << x*y*0.5 << endl;
+	}
+};
+
+class square : public base {	// 定义正方形类，基类成员x为底边长
+public:
+	square(int x) : base(x, x) {}
+	void disp() {
+		cout << "正方形面积：" << x*x << endl;
+	}
+};
+
+class circle : public base {	// 定义正方形类，基类成员x为底边长
+public:
+	circle(int x) : base(x, x) {}
+	void disp() {
+		cout << "圆形面积：" << x*x*3.1416 << endl;
+	}
+};
+
+int main() {
+	base *p;	// 定义基类指针p
+	triangle t(20, 20);
+	square s(20);
+	circle c(20);
+	p = &t;
+	p->disp();
+	p = &s;
+	p->disp();
+	p = &c;
+	p->disp();
+
+	return 0;
+}
+
