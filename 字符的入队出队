@@ -3,16 +3,19 @@
 #include "stdlib.h"
 
 #define M 5
-struct CycQueue{
+
+struct CycQueue{    //循环队列
 	char arr[M];
 	int front;
 	int rear;
 };
+
 void InitQ(CycQueue &cq)
 {
 	cq.front=0;
 	cq.rear=0;
 }
+
 bool fullQ(CycQueue cq)
 {
 	if( (cq.rear+1)%M==cq.front)
@@ -20,6 +23,7 @@ bool fullQ(CycQueue cq)
 	else
 		return false;
 }
+
 bool emptyQ(CycQueue cq)
 {
 	if( cq.rear==cq.front)
@@ -27,6 +31,7 @@ bool emptyQ(CycQueue cq)
 	else
 		return false;
 }
+
 void InQ(CycQueue &cq, char ch)
 {
 	cq.arr[cq.rear]=ch;
